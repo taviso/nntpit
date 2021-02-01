@@ -13,6 +13,8 @@
 *.wixobj
 *.wixpdb
 *.dll
+*.o
+nntpit
 .clangd/
 compile_commands.json
 build-*/
