@@ -61,16 +61,22 @@ All other code is by @taviso.
 I prefer to read discussions in a newsreader. There are many powerful features
 that we never got back when the world moved away from usenet.
 
-There are the simple things like keeping track of which posts you've read and
-haven't seen yet.
+There are the simple things like keeping track of which posts you've read or
+haven't seen yet, and customizing how threads are sorted and displayed.
 
-Then there are more advanced things like scoring.
+There's more advanced features like tagging, watching, ignoring and so on. Have you
+ever been following a discussion, but it's wandered off topic and people are now
+discussing something you're not interested in? Well newsreaders let you ignore
+subthreads, but continue reading the rest without the clutter.
+
+Then there are poweruser features like scoring.
 
 ## Scoring
 
 Most newsreaders will let you adjust the score of an article based on rules. A
 post with a high score will be higlighted, low scores might be dimmed, and very
-low scores might be completely hidden.
+low scores might be completely hidden. You could also sort by score, so the best
+comments are at the top, and you read those first.
 
 The simplest example would be if there's a user who's posts you always enjoy you
 can score their posts higher. Their comments will be hilighted and you'll never
@@ -81,9 +87,16 @@ experience. Let's say you want to hilight all the cookie recipes posted by
 cookielover22, unless they contain the word "chocolate" because you're allergic.
 No problem, you can do that too.
 
-That's not all, have you ever been reading a thread, but it's wandered off topic
-and people are now discussing something you don't care about? Well newsreaders
-let you ignore subthreads, but continue reading the rest without the clutter.
+How about assigning scores for different ingredients you like, then sorting all
+the comments by score?
+
+| Keyword    | Score  |
+| ---------- | ------ |
+| Chocolate  |  -10   |
+| Raisins    |  +20   |
+| Nuts       |  +15   |
+
+If you want to read about scoring, the slrn documentation is [here](https://slrn.info/docs/score.txt).
 
 # How?
 
