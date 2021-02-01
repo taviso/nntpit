@@ -17,7 +17,7 @@ You need `libev-dev`, `libglib2.0-dev`, `libjson-c-dev` and `libcurl4-openssl-de
 
 To make the configure script:
 
-````bash
+```bash
 $ autoreconf -i
 $ automake --add-missing # ignore any errors
 ```
