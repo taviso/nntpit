@@ -52,7 +52,7 @@ debugging logs your software can generate. Please be willing to help test!
 # Credit
 
 The nntp code is based on [nntpsink](https://github.com/unixwitch/nntpsink) by
-Flicity Tarnell (@unixwitch).
+Felicity Tarnell (@unixwitch).
 
 All other code is by @taviso.
 
