@@ -16,8 +16,8 @@ sysconfdir	= @sysconfdir@
 CC		= @CC@
 MAKEDEPEND	= @CC@ -MM
 INSTALL		= @INSTALL@
-CFLAGS		= @CFLAGS@ @curl_CFLAGS@ @glib_CFLAGS@ @json_CFLAGS@ -fsanitize=address -ggdb3 -O0
-LDFLAGS		= @LDFLAGS@ -fsanitize=address
+CFLAGS		= @CFLAGS@ @curl_CFLAGS@ @glib_CFLAGS@ @json_CFLAGS@ -ggdb3
+LDFLAGS		= @LDFLAGS@
 CPPFLAGS	= @CPPFLAGS@ -I@top_srcdir@ -I.	\
 		  -DSYSCONFDIR=\"@sysconfdir@\"
 LIBS		= @LIBS@ @glib_LIBS@ @json_LIBS@ @curl_LIBS@
