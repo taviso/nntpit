@@ -69,7 +69,7 @@ ever been following a discussion, but it's wandered off topic and people are now
 discussing something you're not interested in? Well newsreaders let you ignore
 subthreads, but continue reading the rest without the clutter.
 
-Then there are poweruser features like scoring.
+Then there are poweruser features like scoring and macros.
 
 ## Scoring
 
