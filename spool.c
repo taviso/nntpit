@@ -67,10 +67,7 @@ int reddit_spool_store(json_object *spool, json_object *object)
     }
 
     // Is this object already in the spool?
-    if (json_object_object_add(spool, id, object) == -1) {
-        g_warning("failed to add article %s to spool", id);
-        return -1;
-    }
+    json_object_object_add(spool, id, object);
 
     if (!json_object_object_get_ex(object, "data", &data)) {
         g_warning("badly formed object, expected a data property");
