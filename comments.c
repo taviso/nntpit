@@ -86,6 +86,7 @@ int reddit_parse_link(json_object *link, json_object *props, json_object *newsrc
     // Record the last seen title.
     json_object_object_add(props, "title", json_object_new_string(json_object_get_string_prop(data, "title")));
     json_article_to_mbox(data);
+    return 0;
 }
 
 // Parse the comment object specified, and return a news message
