@@ -96,6 +96,9 @@ the comments by score?
 | Raisins    |  +20   |
 | Nuts       |  +15   |
 
+Now a post for "New Recipe for Chocolate Raisin Brownies!!" will be scored -10+20+15 = 25, and
+so on.
+
 If you want to read about scoring, the slrn documentation is [here](https://slrn.info/docs/score.txt).
 
 # How?
