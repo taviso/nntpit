@@ -10,6 +10,7 @@ enum {
     REDDIT_OBJ_SUBREDDIT,
     REDDIT_OBJ_AWARD,
     REDDIT_OBJ_PROMO,
+    REDDIT_OBJ_MORE,
 };
 
 int

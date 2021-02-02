@@ -53,6 +53,9 @@ reddit_object_type(json_object *obj)
     if (json_object_check_strprop(obj, "kind", "t8", false))
         return REDDIT_OBJ_PROMO;
 
+    if (json_object_check_strprop(obj, "kind", "more", false))
+        return REDDIT_OBJ_MORE;
+
     g_warning("unexpected object kind found %s", json_object_get_string_prop(obj, "kind"));
 
     return -1;

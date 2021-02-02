@@ -59,6 +59,11 @@ int reddit_spool_store(json_object *spool, json_object *object)
     json_object *replies;
     json_object *data;
 
+    if (type == REDDIT_OBJ_MORE) {
+        g_debug("TODO: handle 'more' objects");
+        return -1;
+    }
+
     g_warn_if_fail(type == REDDIT_OBJ_LINK || type == REDDIT_OBJ_COMMENT);
 
     if (id == NULL) {
@@ -218,12 +223,17 @@ int reddit_spool_maparticles(json_object *spool, const char *subreddit, json_obj
         int type = reddit_object_type(article);
         json_object *data;
 
-        g_warn_if_fail(type == REDDIT_OBJ_LINK || type == REDDIT_OBJ_COMMENT);
-
         if (!json_object_object_get_ex(article, "data", &data)) {
             g_warning("failed to find the data element of a spool entry, corrupted?");
             continue;
         }
+
+        if (type == REDDIT_OBJ_MORE) {
+            g_debug("TODO: handle more objects");
+            continue;
+        }
+
+        g_warn_if_fail(type == REDDIT_OBJ_LINK || type == REDDIT_OBJ_COMMENT);
 
         // Check if this belongs to this group.
         if (json_object_check_strprop(data, "subreddit", subreddit, false)) {
@@ -235,7 +245,9 @@ int reddit_spool_maparticles(json_object *spool, const char *subreddit, json_obj
         }
     }
 
-    g_debug("finished searching, high watermark for %s is now %d", subreddit, reddit_spool_highwatermark(groupmap));
+    g_debug("finished searching, high watermark for %s is now %d",
+            subreddit,
+            reddit_spool_highwatermark(groupmap));
 
     return 0;
 }
