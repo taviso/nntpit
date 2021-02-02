@@ -89,6 +89,18 @@ int reddit_parse_link(json_object *link, json_object *props, json_object *newsrc
     return 0;
 }
 
+static unsigned str_count_newlines(const char *string)
+{
+    unsigned count = 1;
+
+    while ((string = strchr(string, '\n'))) {
+        count++;
+        string++;
+    }
+
+    return count;
+}
+
 // Parse the comment object specified, and return a news message
 int reddit_parse_comment(json_object *comment, char **headers, char **body)
 {
@@ -135,9 +147,12 @@ int reddit_parse_comment(json_object *comment, char **headers, char **body)
     strftime(date, sizeof date, "%a, %d %b %Y %T %z", gmtime(&unixtime));
 
     if (type == REDDIT_OBJ_COMMENT) {
+        *body = g_strdup(json_object_get_string_prop(data, "body"));
+
         *headers = g_strdup_printf(
             "From: %s\r\n"
             "Subject: Re: %s\r\n"
+            "Lines: %u\r\n"
             "Date: %s\r\n"
             "Message-Id: <%s>\r\n"
             "References: <%s>\r\n"
@@ -146,13 +161,11 @@ int reddit_parse_comment(json_object *comment, char **headers, char **body)
             "Content-Type: text/plain; charset=UTF-8\r\n",
             json_object_get_string_prop(data, "author"),
             json_object_get_string_prop(data, "title"),
+            str_count_newlines(*body),
             date,
             json_object_get_string_prop(data, "name"),
             json_object_get_string_prop(data, "parent_id"),
             json_object_get_string_prop(data, "subreddit"));
-
-        //TODO copy crosspost logic from above.
-        *body = g_strdup(json_object_get_string_prop(data, "body"));
     } else {
         char *newsgroups = g_strdup(json_object_get_string_prop(data, "subreddit"));
 
@@ -171,20 +184,6 @@ int reddit_parse_comment(json_object *comment, char **headers, char **body)
             }
         }
 
-        *headers = g_strdup_printf(
-            "From: %s\r\n"
-            "Subject: %s\r\n"
-            "Date: %s\r\n"
-            "Message-Id: <%s>\r\n"
-            "Newsgroups: %s\r\n"
-            "Path: reddit!not-for-mail\r\n"
-            "Content-Type: text/plain; charset=UTF-8\r\n",
-            json_object_get_string_prop(data, "author"),
-            json_object_get_string_prop(data, "title"),
-            date,
-            json_object_get_string_prop(data, "name"),
-            newsgroups);
-
         *body = g_strdup(json_object_get_string_prop(data, "selftext"));
 
         // Must be a link post?
@@ -194,6 +193,21 @@ int reddit_parse_comment(json_object *comment, char **headers, char **body)
             *body = g_strdup(json_object_get_string_prop(data, "url"));
         }
 
+        *headers = g_strdup_printf(
+            "From: %s\r\n"
+            "Subject: %s\r\n"
+            "Date: %s\r\n"
+            "Lines: %u\r\n"
+            "Message-Id: <%s>\r\n"
+            "Newsgroups: %s\r\n"
+            "Path: reddit!not-for-mail\r\n"
+            "Content-Type: text/plain; charset=UTF-8\r\n",
+            json_object_get_string_prop(data, "author"),
+            json_object_get_string_prop(data, "title"),
+            date,
+            str_count_newlines(*body),
+            json_object_get_string_prop(data, "name"),
+            newsgroups);
         g_free(newsgroups);
     }
     return 0;
