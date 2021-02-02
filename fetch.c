@@ -66,7 +66,7 @@ int fetch_subreddit_json(json_object *spool, json_object *newsrc, const char *gr
 
   /* some servers don't like requests that are made without a user-agent
      field, so we provide one */ 
-  curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "nntpreader/1.0");
+  curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "nntpit/1.0");
 
   /* get it! */ 
   res = curl_easy_perform(curl_handle);
@@ -194,7 +194,7 @@ int fetch_comments_json(json_object *spool, json_object *newsrc, const char *gro
 
   /* some servers don't like requests that are made without a user-agent
      field, so we provide one */ 
-  curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "nntpreader/1.0");
+  curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "nntpit/1.0");
 
   /* get it! */ 
   res = curl_easy_perform(curl_handle);
