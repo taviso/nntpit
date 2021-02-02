@@ -8,6 +8,8 @@ AC_INIT([nntpit], [T.1.0], [taviso@gmail.com])
 AC_CONFIG_SRCDIR([nntpit.c])
 AC_CONFIG_HEADERS([setup.h])
 
+AM_INIT_AUTOMAKE([1.11 -Wall -Wno-extra-portability foreign])
+
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL

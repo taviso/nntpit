@@ -19,7 +19,6 @@ To make the configure script:
 
 ```bash
 $ autoreconf -i
-$ automake --add-missing # ignore any errors
 ```
 
 Now type the usual `./configure`, `make`.
