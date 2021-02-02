@@ -575,7 +575,11 @@ void handle_group_cmd(client_t *cl, const char *param)
 
 void handle_head_cmd(client_t *cl, const char *param, bool article)
 {
+    json_object *object;
     char *endptr;
+    char *headers;
+    char *body;
+    char *msgid;
     int number;
 
     // List available newsgroups
@@ -592,61 +596,84 @@ void handle_head_cmd(client_t *cl, const char *param, bool article)
     // Parse the number requested, note if *endptr == '<' it's a msgid.
     number = strtoul(param, &endptr, 10);
 
+    object = NULL;
+
+    // In slrn there is a get_parent_header command that uses this command
+    // to rebuild threads.
     if (number == 0 && *endptr != '\0') {
-        client_printf(cl, "501 didnt understand, see 3.1.2\r\n");
+        // Check that it looks like <msgid>
+        if (*endptr != '<' || endptr[strlen(endptr) - 1] != '>') {
+            client_printf(cl, "501 didnt understand, see 3.1.2\r\n");
+            client_flush(cl);
+            return;
+        }
+
+        // Extract the id.
+        msgid = g_strndup(endptr + 1, strlen(endptr) - 2);
+
+        // Now we lookup that id in the spool file.
+        if (!json_object_object_get_ex(spool, msgid, &object)) {
+            // Umm, I guess it was outdated?
+            client_printf(cl, "423 sorry, couldnt find msg %s\r\n", msgid);
+            g_free(msgid);
+            return;
+        }
+    } else {
+        json_object_object_foreach(groupset, msg, artnum) {
+            if (json_object_get_int(artnum) == number) {
+
+                // Now we lookup that id in the spool file.
+                if (!json_object_object_get_ex(spool, msg, &object)) {
+                    // Umm, I guess it was outdated?
+                    client_printf(cl, "423 sorry, couldnt find that one\r\n");
+                    return;
+                }
+
+                // We found the number requested.
+                msgid = g_strdup(msg);
+
+                break;
+            }
+        }
+    }
+
+    // If we reach here without a message, that we couldn't find it in the spool
+    if (object == NULL) {
+        client_printf(cl, "423 understood but couldnt find it, see 3.1.2\r\n");
         client_flush(cl);
         return;
     }
 
-    json_object_object_foreach(groupset, msgid, artnum) {
-        if (json_object_get_int(artnum) == number) {
-            json_object *object;
-            char *headers;
-            char *body;
-
-            // Now we lookup that id in the spool file.
-            if (!json_object_object_get_ex(spool, msgid, &object)) {
-                // Umm, I guess it was outdated?
-                client_printf(cl, "423 sorry, couldnt find that one\r\n");
-                return;
-            }
-
-            // Now we need to translate that object into an RFC5536 message
-            if (reddit_parse_comment(object, &headers, &body) != 0) {
-                client_printf(cl, "503 sorry, couldnt get the headers\r\n");
-                return;
-            }
-
-            if (headers == NULL || body == NULL) {
-                client_printf(cl, "503 sorry, failure generating message\r\n");
-                g_free(headers);
-                g_free(body);
-                return;
-            }
-
-            client_printf(cl, "%d %d <%s> message generated, text follows\r\n",
-                article ? 220 : 221,
-                number,
-                msgid);
-
-            client_send(cl, headers);
-
-            if (article) {
-                client_send(cl, "\r\n");
-                client_send(cl, body);
-                client_send(cl, "\r\n");
-            }
-
-            client_printf(cl, ".\r\n");
-            client_flush(cl);
-            g_free(headers);
-            g_free(body);
-            return;
-        }
+    // Now we need to translate that object into an RFC5536 message
+    if (reddit_parse_comment(object, &headers, &body) != 0) {
+        client_printf(cl, "503 sorry, couldnt get the headers\r\n");
+        return;
     }
 
-    client_printf(cl, "423 understood but couldnt find it, see 3.1.2\r\n");
+    if (headers == NULL || body == NULL) {
+        client_printf(cl, "503 sorry, failure generating message\r\n");
+        g_free(headers);
+        g_free(body);
+        return;
+    }
+
+    client_printf(cl, "%d %d <%s> message generated, text follows\r\n",
+        article ? 220 : 221,
+        number,
+        msgid);
+
+    client_send(cl, headers);
+
+    if (article) {
+        client_send(cl, "\r\n");
+        client_send(cl, body);
+        client_send(cl, "\r\n");
+    }
+
+    client_printf(cl, ".\r\n");
     client_flush(cl);
+    g_free(headers);
+    g_free(body);
     return;
 }
 
