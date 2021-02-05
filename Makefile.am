@@ -11,4 +11,4 @@ LDADD		= $(curl_LIBS) $(glib_LIBS) $(json_LIBS)
 bin_PROGRAMS	= nntpit
 
 nntpit_SOURCES	= nntpit.c charq.c strlcpy.c reddit.c spool.c comments.c \
-	subreddit.c jsonutil.c fetch.c charq.h reddit.h jsonutil.h
+	subreddit.c jsonutil.c fetch.c rfc5536.c charq.h reddit.h jsonutil.h

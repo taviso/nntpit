@@ -645,7 +645,7 @@ void handle_head_cmd(client_t *cl, const char *param, bool article)
     }
 
     // Now we need to translate that object into an RFC5536 message
-    if (reddit_parse_comment(object, &headers, &body) != 0) {
+    if (reddit_parse_comment(spool, object, &headers, &body) != 0) {
         client_printf(cl, "503 sorry, couldnt get the headers\r\n");
         return;
     }

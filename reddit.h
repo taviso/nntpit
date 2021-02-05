@@ -47,7 +47,8 @@ int
 reddit_spool_lowwatermark(json_object *groupmap);
 
 int
-reddit_parse_comment(json_object *comment,
+reddit_parse_comment(json_object *spool,
+                     json_object *comment,
                      char **headers,
                      char **body);
 
@@ -57,5 +58,7 @@ fetch_subreddit_json(json_object *spool, json_object *newsrc, const char *url);
 int
 fetch_comments_json(json_object *spool, json_object *newsrc, const char *group, const char *id);
 
+int
+article_generate_references(json_object *spool, json_object *object, char **references);
 
 #endif

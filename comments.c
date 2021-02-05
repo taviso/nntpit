@@ -102,7 +102,7 @@ static unsigned str_count_newlines(const char *string)
 }
 
 // Parse the comment object specified, and return a news message
-int reddit_parse_comment(json_object *comment, char **headers, char **body)
+int reddit_parse_comment(json_object *spool, json_object *comment, char **headers, char **body)
 {
     json_object *data;
     json_object *created;
@@ -147,7 +147,13 @@ int reddit_parse_comment(json_object *comment, char **headers, char **body)
     strftime(date, sizeof date, "%a, %d %b %Y %T %z", gmtime(&unixtime));
 
     if (type == REDDIT_OBJ_COMMENT) {
+        char *references;
+
         *body = g_strdup(json_object_get_string_prop(data, "body"));
+
+        if (article_generate_references(spool, comment, &references) != 0) {
+            g_warning("failed to generate a references header");
+        }
 
         *headers = g_strdup_printf(
             "From: %s\r\n"
@@ -155,7 +161,7 @@ int reddit_parse_comment(json_object *comment, char **headers, char **body)
             "Lines: %u\r\n"
             "Date: %s\r\n"
             "Message-Id: <%s>\r\n"
-            "References: <%s>\r\n"
+            "References: %s\r\n"
             "Newsgroups: %s\r\n"
             "Path: reddit!not-for-mail\r\n"
             "Content-Type: text/plain; charset=UTF-8\r\n",
@@ -164,8 +170,10 @@ int reddit_parse_comment(json_object *comment, char **headers, char **body)
             str_count_newlines(*body),
             date,
             json_object_get_string_prop(data, "name"),
-            json_object_get_string_prop(data, "parent_id"),
+            references,
             json_object_get_string_prop(data, "subreddit"));
+
+        g_free(references);
     } else {
         char *newsgroups = g_strdup(json_object_get_string_prop(data, "subreddit"));
 
