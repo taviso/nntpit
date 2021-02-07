@@ -534,6 +534,14 @@ void handle_list_cmd(client_t *cl, const char *param)
     return;
 }
 
+void handle_newgroups_cmd(client_t *cl, const char *param)
+{
+    client_printf(cl, "231 new groups are not provided by nntpit\r\n");
+    client_printf(cl, ".\r\n");
+    client_flush(cl);
+    return;
+}
+
 void handle_group_cmd(client_t *cl, const char *param)
 {
     int highwm;
@@ -729,6 +737,8 @@ void client_read(struct ev_loop *loop, ev_io *w, int revents)
                 handle_list_cmd(cl, data);
             } else if (strcasecmp(cmd, "GROUP") == 0) {
                 handle_group_cmd(cl, data);
+            } else if (strcasecmp(cmd, "NEWGROUPS") == 0) {
+                handle_newgroups_cmd(cl, data);
             } else if (strcasecmp(cmd, "HEAD") == 0) {
                 handle_head_cmd(cl, data, false);
             } else if (strcasecmp(cmd, "ARTICLE") == 0) {
