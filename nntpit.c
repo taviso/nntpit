@@ -563,7 +563,7 @@ void handle_group_cmd(client_t *cl, const char *param)
     highwm = reddit_spool_highwatermark(groupset);
     lowwm  = reddit_spool_lowwatermark(groupset);
 
-    client_printf(cl, "211 %d %d %d /r/%s\r\n",
+    client_printf(cl, "211 %d %d %d %s\r\n",
         highwm - lowwm,
         lowwm,
         highwm,
