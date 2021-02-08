@@ -581,7 +581,53 @@ void handle_group_cmd(client_t *cl, const char *param)
     return;
 }
 
-void handle_head_cmd(client_t *cl, const char *param, bool article)
+void handle_listgroup_cmd(client_t *cl, const char *param)
+{
+    int highwm;
+    int lowwm;
+
+    if (!param) {
+        client_printf(cl, "501 group must be specified, see 6.1.1.2\r\n");
+        return;
+    }
+
+    if (fetch_subreddit_json(spool, newsrc, param) == 0) {
+        g_debug("the fetch worked");
+
+        // Save any updates to the spool or article map.
+        reddit_spool_expunge(spool);
+
+        json_object_to_file("newsrc", newsrc);
+        json_object_to_file("spool", spool);
+    }
+
+    if (!json_object_object_get_ex(newsrc, param, &groupset)) {
+        g_warning("unknown group: TODO: subscribe to it, this is like a command in slrn");
+        client_printf(cl, "411 i dont have that group\r\n");
+        return;
+    }
+
+    highwm = reddit_spool_highwatermark(groupset);
+    lowwm  = reddit_spool_lowwatermark(groupset);
+
+    client_printf(cl, "211 %d %d %d %s\r\n",
+        highwm - lowwm,
+        lowwm,
+        highwm,
+        param);
+
+    for (int i = lowwm; i < highwm; i++) {
+        client_printf(cl, "%d\r\n", i);
+    }
+
+    client_printf(cl, ".\r\n");
+    client_flush(cl);
+
+    client_flush(cl);
+    return;
+}
+
+void handle_head_cmd(client_t *cl, const char *param, bool head, bool article)
 {
     json_object *object;
     char *endptr;
@@ -589,6 +635,7 @@ void handle_head_cmd(client_t *cl, const char *param, bool article)
     char *body;
     char *msgid;
     int number;
+    int code;
 
     // List available newsgroups
     if (!param) {
@@ -665,15 +712,31 @@ void handle_head_cmd(client_t *cl, const char *param, bool article)
         return;
     }
 
+    // Figure out which response code is expected.
+    if (head && article) {
+        code = 220;
+    }
+    if (head && !article) {
+        code = 221;
+    }
+    if (!head && article) {
+        code = 222;
+    }
+
     client_printf(cl, "%d %d <%s> message generated, text follows\r\n",
-        article ? 220 : 221,
+        code,
         number,
         msgid);
 
-    client_send(cl, headers);
+    if (head) {
+        client_send(cl, headers);
+    }
+
+    if (head && article) {
+        client_send(cl, "\r\n");
+    }
 
     if (article) {
-        client_send(cl, "\r\n");
         client_send(cl, body);
         client_send(cl, "\r\n");
     }
@@ -737,12 +800,16 @@ void client_read(struct ev_loop *loop, ev_io *w, int revents)
                 handle_list_cmd(cl, data);
             } else if (strcasecmp(cmd, "GROUP") == 0) {
                 handle_group_cmd(cl, data);
+            } else if (strcasecmp(cmd, "LISTGROUP") == 0) {
+                handle_listgroup_cmd(cl, data);
             } else if (strcasecmp(cmd, "NEWGROUPS") == 0) {
                 handle_newgroups_cmd(cl, data);
             } else if (strcasecmp(cmd, "HEAD") == 0) {
-                handle_head_cmd(cl, data, false);
+                handle_head_cmd(cl, data, true, false);
             } else if (strcasecmp(cmd, "ARTICLE") == 0) {
-                handle_head_cmd(cl, data, true);
+                handle_head_cmd(cl, data, true, true);
+            } else if (strcasecmp(cmd, "BODY") == 0) {
+                handle_head_cmd(cl, data, false, true);
             } else if (strcasecmp(cmd, "CAPABILITIES") == 0) {
                 client_printf(cl,
                         "101 Capability list:\r\n"
