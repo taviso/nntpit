@@ -47,10 +47,10 @@ int article_generate_references(json_object *spool, json_object *object, char **
         parentid = json_object_get_string_prop(data, "parent_id");
 
         // Append that to the list.
-        refs = g_strdup_printf("%s%s<%s>",
-            *references,
+        refs = g_strdup_printf("<%s>%s%s",
+            parentid,
             **references != '\0' ? " " : "",
-            parentid);
+            *references);
 
         // Free the old header.
         g_free(*references);
