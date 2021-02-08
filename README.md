@@ -9,11 +9,11 @@ newsgroups!
 
 ![Slrn Article](doc/article.png)
 
-> This software is in an early experimental state, you **will** encounter bugs.
+> This software is in an early experimental state: you **will** encounter bugs.
 
 # Building
 
-You need `libev-dev`, `libglib2.0-dev`, `libjson-c-dev` and `libcurl4-openssl-dev`.
+You need `libev-dev`, `libglib2.0-dev`, `libjson-c-dev`, and `libcurl4-openssl-dev`.
 
 To make the configure script:
 
@@ -21,17 +21,17 @@ To make the configure script:
 $ autoreconf -i
 ```
 
-Now type the usual `./configure`, `make`.
+Now type the usual `./configure`, and `make`.
 
 # Usage
 
 `$ ./nntpit -D -p 8119`
 
-Now connect your newsreader, if you use slrn, you would do this:
+Now connect your newsreader; if you use slrn, you would do this:
 
 `$ NNTPSERVER=news://localhost:8119 slrn -f reddit --create`
 
-The groups list will be empty at first, but don't worry, that's normal.
+The groups list will be empty at first, but don't worry: that's normal.
 
 Press `a` to add a group, and type the name of the subreddit you want to subscribe to.
 
@@ -43,14 +43,14 @@ It should populate a list of articles and comments for you to read.
 
 # Reporting Bugs
 
-If you're using slrn, please include the `--debug`, and the nntpit `-D` log.
+If you're using slrn, please include the `--debug` and the nntpit `-D` log.
 
-If you're not using slrn, please include as much detail as you can, and any
+If you're not using slrn, please include as much detail as you can, and include any
 debugging logs your software can generate. Please be willing to help test!
 
 # Credit
 
-The nntp code is based on [nntpsink](https://github.com/unixwitch/nntpsink) by
+The NNTP code is based on [nntpsink](https://github.com/unixwitch/nntpsink) by
 Felicity Tarnell (@unixwitch).
 
 All other code is by @taviso.
@@ -63,12 +63,12 @@ that we never got back when the world moved away from usenet.
 There are the simple things like keeping track of which posts you've read or
 haven't seen yet, and customizing how threads are sorted and displayed.
 
-There's more advanced features like tagging, watching, ignoring and so on. Have you
+There's more advanced features like tagging, watching, ignoring, and so on. Have you
 ever been following a discussion, but it's wandered off topic and people are now
-discussing something you're not interested in? Well newsreaders let you ignore
+discussing something you're not interested in? Well, newsreaders let you ignore
 subthreads, but continue reading the rest without the clutter.
 
-Then there are poweruser features like scoring and macros.
+Then there are poweruser features, like scoring and macros.
 
 ## Scoring
 
@@ -77,14 +77,14 @@ post with a high score will be higlighted, low scores might be dimmed, and very
 low scores might be completely hidden. You could also sort by score, so the best
 comments are at the top, and you read those first.
 
-The simplest example would be if there's a user who's posts you always enjoy you
+The simplest example would be if there's a user whose posts you always enjoy you
 can score their posts higher. Their comments will be hilighted and you'll never
 miss them.
 
 You can chain complicated sets of rules together, really customizing your
-experience. Let's say you want to hilight all the cookie recipes posted by
+experience. Let's say you want to highlight all the cookie recipes posted by
 cookielover22, unless they contain the word "chocolate" because you're allergic.
-No problem, you can do that too.
+No problem: you can do that too.
 
 How about assigning scores for different ingredients you like, then sorting all
 the comments by score?
