@@ -20,7 +20,7 @@ static void json_article_to_mbox(json_object *article)
     char date[128];
     const char *body;
 
-    if (!json_object_object_get_ex(article, "created", &created)) {
+    if (!json_object_object_get_ex(article, "created_utc", &created)) {
         log_error("there was no created date");
         return;
     }
