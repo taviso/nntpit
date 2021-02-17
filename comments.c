@@ -19,7 +19,7 @@ void json_article_to_mbox(json_object *article)
     char date[128];
     const char *body;
 
-    if (!json_object_object_get_ex(article, "created", &created)) {
+    if (!json_object_object_get_ex(article, "created_utc", &created)) {
         g_info("there was no created date");
         return;
     }
@@ -130,7 +130,7 @@ int reddit_parse_comment(json_object *spool, json_object *comment, char **header
         return -1;
     }
 
-    if (!json_object_object_get_ex(data, "created", &created)) {
+    if (!json_object_object_get_ex(data, "created_utc", &created)) {
         g_warning("there was no created date in the comment");
         return -1;
     }
