@@ -29,7 +29,7 @@ cq_free(cq)
   charq_t *cq;
 {
 charq_ent_t *cqe;
-  while (cqe = TAILQ_FIRST(&cq->cq_ents)) {
+  while ((cqe = TAILQ_FIRST(&cq->cq_ents))) {
     TAILQ_REMOVE(&cq->cq_ents, cqe, cqe_list);
     free(cqe);
   }
