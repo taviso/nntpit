@@ -769,7 +769,7 @@ void client_read(struct ev_loop *loop, ev_io *w, int revents)
         return;
     }
 
-    while (ln = cq_read_line(cl->cl_rdbuf)) {
+    while ((ln = cq_read_line(cl->cl_rdbuf))) {
         char  *cmd, *data;
 
         if (debug)
