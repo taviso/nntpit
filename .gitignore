@@ -21,3 +21,16 @@ build-*/
 a.out
 autom4te.cache/
 config.log
+Makefile.in
+aclocal.m4
+compile
+configure
+depcomp
+install-sh
+missing
+setup.h.in
+.deps/
+Makefile
+config.status
+setup.h
+stamp-h1
