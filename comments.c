@@ -63,6 +63,7 @@ void json_article_to_mbox(json_object *article)
     fprintf(stdout, "Path: reddit!not-for-mail\n");
     fprintf(stdout, "Content-Type: text/plain; charset=UTF-8\n");
     fprintf(stdout, "Content-Length: %lu\n", strlen(body));
+    fprintf(stdout, "X-Reddit-URL: %s\n", json_object_get_string_prop(article, "url"));
     fprintf(stdout, "\n");
     fprintf(stdout, "%s", body);
     fprintf(stdout, "\n\n");
@@ -164,14 +165,16 @@ int reddit_parse_comment(json_object *spool, json_object *comment, char **header
             "References: %s\r\n"
             "Newsgroups: %s\r\n"
             "Path: reddit!not-for-mail\r\n"
-            "Content-Type: text/plain; charset=UTF-8\r\n",
+            "Content-Type: text/plain; charset=UTF-8\r\n"
+            "X-Reddit-URL: https://www.reddit.com%s\r\n",
             json_object_get_string_prop(data, "author"),
             json_object_get_string_prop(data, "title"),
             str_count_newlines(*body),
             date,
             json_object_get_string_prop(data, "name"),
             references,
-            json_object_get_string_prop(data, "subreddit"));
+            json_object_get_string_prop(data, "subreddit"),
+            json_object_get_string_prop(data, "permalink"));
 
         g_free(references);
     } else {
@@ -209,13 +212,15 @@ int reddit_parse_comment(json_object *spool, json_object *comment, char **header
             "Message-Id: <%s>\r\n"
             "Newsgroups: %s\r\n"
             "Path: reddit!not-for-mail\r\n"
-            "Content-Type: text/plain; charset=UTF-8\r\n",
+            "Content-Type: text/plain; charset=UTF-8\r\n"
+            "X-Reddit-URL: https://www.reddit.com%s\r\n",
             json_object_get_string_prop(data, "author"),
             json_object_get_string_prop(data, "title"),
             date,
             str_count_newlines(*body),
             json_object_get_string_prop(data, "name"),
-            newsgroups);
+            newsgroups,
+            json_object_get_string_prop(data, "permalink"));
         g_free(newsgroups);
     }
     return 0;

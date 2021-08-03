@@ -64,6 +64,7 @@ static void json_article_to_mbox(json_object *article)
     fprintf(stdout, "Path: reddit!not-for-mail\n");
     fprintf(stdout, "Content-Type: text/plain; charset=UTF-8\n");
     fprintf(stdout, "Content-Length: %lu\n", strlen(body));
+    fprintf(stdout, "X-Reddit-URL: %s\n", json_object_get_string_prop(article, "url"));
     fprintf(stdout, "\n");
     fprintf(stdout, "%s", body);
     fprintf(stdout, "\n\n");
