@@ -618,7 +618,7 @@ void handle_xover_cmd(client_t *cl, const char *param)
                 line_count = body ? str_count_newlines(body) : 0;
 
                 // TODO: calculate bytes, lines.
-                client_printf(cl, "%d\t%s\t%s\t%s\t<%s>\t%s\t%d\t%u\r\n",
+                client_printf(cl, "%d\t%s\t%s\t%s\t<%s@reddit>\t%s\t%d\t%u\r\n",
                                   i,
                                   json_object_get_string_prop(data, "title"),
                                   json_object_get_string_prop(data, "author"),

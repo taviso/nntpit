@@ -47,7 +47,7 @@ int article_generate_references(json_object *spool, json_object *object, char **
         parentid = json_object_get_string_prop(data, "parent_id");
 
         // Append that to the list.
-        refs = g_strdup_printf("<%s>%s%s",
+        refs = g_strdup_printf("<%s@reddit>%s%s",
             parentid,
             **references != '\0' ? " " : "",
             *references);
