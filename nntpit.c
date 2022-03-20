@@ -588,6 +588,8 @@ void handle_xover_cmd(client_t *cl, const char *param)
                 json_object *created;
                 time_t unixtime;
                 char date[128];
+                const char* body;
+                int byte_count;
                 if (!json_object_object_get_ex(object, "data", &data))
                     continue;
 
@@ -608,14 +610,18 @@ void handle_xover_cmd(client_t *cl, const char *param)
                 if (references && *references == 0)
                     references = "null";
 
+                body = json_object_get_string_prop(data, "body");
+                byte_count = body ? strlen(body) : 0;
+
                 // TODO: calculate bytes, lines.
-                client_printf(cl, "%d\t%s\t%s\t%s\t<%s>\t%s\t100\t5\r\n",
+                client_printf(cl, "%d\t%s\t%s\t%s\t<%s>\t%s\t%d\t5\r\n",
                                   i,
                                   json_object_get_string_prop(data, "title"),
                                   json_object_get_string_prop(data, "author"),
                                   date,
                                   msg,
-                                  references);
+                                  references,
+                                  byte_count);
 		// TODO: "\tXref: someserver somegroup:somenumber" at the end
             }
         }
