@@ -6,6 +6,7 @@
  */
 
 #include  <stdlib.h>
+#include  <limits.h>
 #include  <sys/types.h>
 #include  <sys/socket.h>
 #include  <sys/resource.h>
@@ -527,11 +528,99 @@ void handle_list_cmd(client_t *cl, const char *param)
 
         client_printf(cl, ".\r\n");
         return;
+    } else if (strcasecmp(param, "OVERVIEW.FMT") == 0) {
+        client_printf(cl, "215 information follows\r\n");
+        // TODO: What are the field names usually used here?
+        client_printf(cl, "subject\r\n");
+        client_printf(cl, "author\r\n");
+        client_printf(cl, "date\r\n");
+        client_printf(cl, "message-id\r\n");
+        client_printf(cl, "references\r\n");
+        client_printf(cl, "byte-count\r\n");
+        client_printf(cl, "line-count\r\n");
+        client_printf(cl, ".\r\n");
+        return;
     }
 
     client_printf(cl, "501 keyword not recognized, see 7.6.2\r\n");
     client_flush(cl);
     return;
+}
+
+void handle_xover_cmd(client_t *cl, const char *param)
+{
+    /* PARAM:
+         Either: an article number
+         Or: an article number followed by a dash to indicate all following
+         Or: an article number followed by a dash followed by an article number
+    */
+
+    /* Output: CRLF-separated stream of
+         number TAB subject TAB author TAB date TAB message-id TAB references TAB byte-count TAB line-count
+    */
+    json_object *object;
+    char* endptr = NULL;
+    char* references;
+    int end = INT_MAX;
+    if (!param) {
+        client_send(cl, "420 No current article selected\r\n");
+        return;
+    }
+    int beginning = strtol(param, &endptr, 10);
+    if (endptr && *endptr == '-') {
+        param = endptr + 1;
+        if (*param) {
+            end = strtol(param, &endptr, 10);
+            if (endptr && *endptr != 0) {
+                client_send(cl, "420 No article(s) selected\r\n");
+                return;
+            }
+        }
+    }
+
+    client_send(cl, "224 Overview information follows\r\n");
+    json_object_object_foreach(groupset, msg, artnum) {
+        int i = json_object_get_int(artnum);
+        if (i >= beginning && i <= end) {
+            // Now we lookup that id in the spool file.
+            if (json_object_object_get_ex(spool, msg, &object)) {
+                json_object *data;
+                json_object *created;
+                time_t unixtime;
+                char date[128];
+                if (!json_object_object_get_ex(object, "data", &data))
+                    continue;
+
+                if (!json_object_object_get_ex(data, "created_utc", &created))
+                    continue;
+
+                if (!json_object_is_type(created, json_type_double))
+                    continue;
+
+                // Convert that into a UNIX time.
+                unixtime = json_object_get_int64(created);
+
+                // RFC822 Format
+                strftime(date, sizeof date, "%a, %d %b %Y %T %z", gmtime(&unixtime));
+
+                if (article_generate_references(spool, object, &references) != 0)
+                    references = "null";
+                if (references && *references == 0)
+                    references = "null";
+
+                // TODO: calculate bytes, lines.
+                client_printf(cl, "%d\t%s\t%s\t%s\t<%s>\t%s\t100\t5\r\n",
+                                  i,
+                                  json_object_get_string_prop(data, "title"),
+                                  json_object_get_string_prop(data, "author"),
+                                  date,
+                                  msg,
+                                  references);
+		// TODO: "\tXref: someserver somegroup:somenumber" at the end
+            }
+        }
+    }
+    client_printf(cl, ".\r\n");
 }
 
 void handle_newgroups_cmd(client_t *cl, const char *param)
@@ -826,12 +915,17 @@ void client_read(struct ev_loop *loop, ev_io *w, int revents)
                 json_object_to_file("newsrc", newsrc);
                 json_object_to_file("spool", spool);
             } else if (strcasecmp(cmd, "MODE") == 0) {
-                if (!data || strcasecmp(data, "STREAM"))
+                if (!data)
                     client_send(cl, "501 Unknown MODE.\r\n");
-                else if (!do_streaming)
-                    client_send(cl, "501 Unknown MODE.\r\n");
+                else if (strcasecmp(data, "STREAM") == 0) {
+                    if (do_streaming)
+                        client_send(cl, "203 Streaming OK.\r\n");
+                    else
+                        client_send(cl, "501 Unknown MODE.\r\n");
+                } else if (strcasecmp(data, "READER") == 0)
+                    client_send(cl, "201 Hello, you can't post\r\n");
                 else
-                    client_send(cl, "203 Streaming OK.\r\n");
+                    client_send(cl, "501 Unknown MODE.\r\n");
             } else if (strcasecmp(cmd, "CHECK") == 0) {
                 if (!do_streaming)
                     client_send(cl, "500 Unknown command.\r\n");
@@ -861,6 +955,8 @@ void client_read(struct ev_loop *loop, ev_io *w, int revents)
                     cl->cl_state = CL_IHAVE;
                     th->th_nsend++;
                 }
+            } else if (strcasecmp(cmd, "XOVER") == 0) {
+                handle_xover_cmd(cl, data);
             } else {
                 client_printf(cl, "500 Unknown command (I saw %s).\r\n", cmd);
             }
