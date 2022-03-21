@@ -530,14 +530,13 @@ void handle_list_cmd(client_t *cl, const char *param)
         return;
     } else if (strcasecmp(param, "OVERVIEW.FMT") == 0) {
         client_printf(cl, "215 information follows\r\n");
-        // TODO: What are the field names usually used here?
         client_printf(cl, "subject\r\n");
-        client_printf(cl, "author\r\n");
+        client_printf(cl, "from\r\n");
         client_printf(cl, "date\r\n");
         client_printf(cl, "message-id\r\n");
         client_printf(cl, "references\r\n");
-        client_printf(cl, "byte-count\r\n");
-        client_printf(cl, "line-count\r\n");
+        client_printf(cl, "bytes\r\n");
+        client_printf(cl, "lines\r\n");
         client_printf(cl, ".\r\n");
         return;
     }
