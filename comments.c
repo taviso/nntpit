@@ -90,7 +90,7 @@ int reddit_parse_link(json_object *link, json_object *props, json_object *newsrc
     return 0;
 }
 
-static unsigned str_count_newlines(const char *string)
+unsigned str_count_newlines(const char *string)
 {
     unsigned count = 1;
 
