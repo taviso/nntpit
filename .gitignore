@@ -34,3 +34,5 @@ Makefile
 config.status
 setup.h
 stamp-h1
+newsrc
+spool
