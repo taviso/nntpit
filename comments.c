@@ -46,7 +46,7 @@ void json_article_to_mbox(json_object *article)
     fprintf(stdout, "From: %s\n", json_object_get_string_prop(article, "author"));
     fprintf(stdout, "Date: %s\n",  date);
     fprintf(stdout, "Subject: %s\n", json_object_get_string_prop(article, "title"));
-    fprintf(stdout, "Message-Id: <%s>\n", json_object_get_string_prop(article, "name"));
+    fprintf(stdout, "Message-Id: <%s@reddit>\n", json_object_get_string_prop(article, "name"));
     fprintf(stdout, "Newsgroups: %s", json_object_get_string_prop(article, "subreddit"));
 
     // Article could be crossposted, check for more groups.
@@ -161,7 +161,7 @@ int reddit_parse_comment(json_object *spool, json_object *comment, char **header
             "Subject: Re: %s\r\n"
             "Lines: %u\r\n"
             "Date: %s\r\n"
-            "Message-Id: <%s>\r\n"
+            "Message-Id: <%s@reddit>\r\n"
             "References: %s\r\n"
             "Newsgroups: %s\r\n"
             "Path: reddit!not-for-mail\r\n"
@@ -209,7 +209,7 @@ int reddit_parse_comment(json_object *spool, json_object *comment, char **header
             "Subject: %s\r\n"
             "Date: %s\r\n"
             "Lines: %u\r\n"
-            "Message-Id: <%s>\r\n"
+            "Message-Id: <%s@reddit>\r\n"
             "Newsgroups: %s\r\n"
             "Path: reddit!not-for-mail\r\n"
             "Content-Type: text/plain; charset=UTF-8\r\n"

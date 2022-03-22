@@ -48,7 +48,7 @@ static void json_article_to_mbox(json_object *article)
     fprintf(stdout, "From: %s\n", json_object_get_string_prop(article, "author"));
     fprintf(stdout, "Date: %s\n",  date);
     fprintf(stdout, "Subject: %s\n", json_object_get_string_prop(article, "title"));
-    fprintf(stdout, "Message-Id: %s\n", json_object_get_string_prop(article, "name"));
+    fprintf(stdout, "Message-Id: <%s@reddit>\n", json_object_get_string_prop(article, "name"));
     fprintf(stdout, "Newsgroups: %s", json_object_get_string_prop(article, "subreddit")); // TODO: crosspost_parent_list
 
     // Crossposted?
