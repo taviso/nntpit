@@ -755,6 +755,8 @@ void handle_head_cmd(client_t *cl, const char *param, bool head, bool article)
     // In slrn there is a get_parent_header command that uses this command
     // to rebuild threads.
     if (number == 0 && *endptr != '\0') {
+        char *hostpart;
+
         // Check that it looks like <msgid>
         if (*endptr != '<' || endptr[strlen(endptr) - 1] != '>') {
             client_printf(cl, "501 didnt understand, see 3.1.2\r\n");
@@ -764,6 +766,14 @@ void handle_head_cmd(client_t *cl, const char *param, bool head, bool article)
 
         // Extract the id.
         msgid = g_strndup(endptr + 1, strlen(endptr) - 2);
+
+        // The agent might be including a host part, e.g. msgid@reddit
+        hostpart = strchr(msgid, '@');
+
+        // If there was a hostpart, truncate it to just the id.
+        if (hostpart != NULL) {
+            *hostpart = '\0';
+        }
 
         // Now we lookup that id in the spool file.
         if (!json_object_object_get_ex(spool, msgid, &object)) {
