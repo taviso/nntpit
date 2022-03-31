@@ -40,6 +40,7 @@ int fetch_subreddit_json(json_object *spool, json_object *newsrc, const char *gr
 {
   CURL *curl_handle;
   json_object *subreddit;
+  json_tokener *tokener;
   CURLcode res;
   char *url;
 
@@ -77,7 +78,14 @@ int fetch_subreddit_json(json_object *spool, json_object *newsrc, const char *gr
   } else {
     g_debug("%lu bytes retrieved, %.8s...", chunk.size, chunk.memory);
 
-    subreddit = json_tokener_parse(chunk.memory);
+    // The JSON_TOKENER_DEFAULT_DEPTH is too shallow for reddit, let's
+    // try doubling it. See https://github.com/taviso/nntpit/issues/7
+    tokener   = json_tokener_new_ex(64);
+    subreddit = NULL;
+
+    if (tokener) {
+        subreddit = json_tokener_parse_ex(tokener, chunk.memory, chunk.size);
+    }
 
     if (subreddit != NULL) {
         json_object *data;
@@ -144,6 +152,7 @@ int fetch_subreddit_json(json_object *spool, json_object *newsrc, const char *gr
       parseerror:
         // Done with this object.
         json_object_put(subreddit);
+        json_tokener_free(tokener);
     } else {
         g_warning("failed to parse subreddit json");
     }
@@ -165,6 +174,7 @@ int fetch_subreddit_json(json_object *spool, json_object *newsrc, const char *gr
 int fetch_comments_json(json_object *spool, json_object *newsrc, const char *group, const char *id)
 {
   CURL *curl_handle;
+  json_tokener *tokener;
   json_object *comments;
   CURLcode res;
   char *url;
@@ -205,7 +215,14 @@ int fetch_comments_json(json_object *spool, json_object *newsrc, const char *gro
   } else {
     g_debug("%lu bytes retrieved, %.8s...", chunk.size, chunk.memory);
 
-    comments = json_tokener_parse(chunk.memory);
+    // The JSON_TOKENER_DEFAULT_DEPTH is too shallow for reddit, let's
+    // try doubling it. See https://github.com/taviso/nntpit/issues/7
+    tokener   = json_tokener_new_ex(64);
+    comments  = NULL;
+
+    if (tokener) {
+        comments = json_tokener_parse_ex(tokener, chunk.memory, chunk.size);
+    }
 
     if (comments != NULL) {
         // Merge every known object with the spool.
@@ -216,6 +233,7 @@ int fetch_comments_json(json_object *spool, json_object *newsrc, const char *gro
       parseerror:
         // Done with this object.
         json_object_put(comments);
+        json_tokener_free(tokener);
     } else {
         g_warning("failed to parse subreddit json");
     }
