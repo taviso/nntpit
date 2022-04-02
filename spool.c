@@ -188,9 +188,17 @@ int reddit_spool_highwatermark(json_object *groupmap)
     return watermark;
 }
 
+// The low-watermark is the lowest article-id we have, sent to the
+// client after GROUP.
 int reddit_spool_lowwatermark(json_object *groupmap)
 {
     int watermark = 0;
+
+    // Set the initial watermark to the first entry, if possible.
+    if (json_object_get_object(groupmap)->head) {
+        struct lh_entry *e = json_object_get_object(groupmap)->head;
+        watermark = json_object_get_int(e->v);
+    }
 
     json_object_object_foreach(groupmap, id, number) {
         if (json_object_get_int(number) < watermark)
