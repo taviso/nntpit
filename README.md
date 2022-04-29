@@ -25,6 +25,8 @@ Now type the usual `./configure`, and `make`.
 
 # Usage
 
+## General usage
+
 `$ ./nntpit -D -p 8119`
 
 Now connect your newsreader; if you use slrn, you would do this:
@@ -40,6 +42,23 @@ Press `a` to add a group, and type the name of the subreddit you want to subscri
 > Don't include the `/r/`!
 
 It should populate a list of articles and comments for you to read.
+
+## Usage with tin
+
+tin needs the server to be first taught about the subreddits you want to
+read so they can be added to the database.  You only need to specify them
+on the command line one time:
+
+`$ ./nntpit -D -p 8119 retrocomputing usenet`
+
+Now start tin:
+
+`$ tin -r -g localhost -p 8119`
+
+The groups list will be empty at first, but don't worry: that's normal.
+
+Press `S` to add a group, and type the name of the subreddit you want to subscribe to
+(eg 'usenet' for /r/usenet).
 
 # Reporting Bugs
 
