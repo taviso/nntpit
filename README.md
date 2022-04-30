@@ -25,7 +25,7 @@ Now type the usual `./configure`, and `make`.
 
 # Usage
 
-## General usage
+## General usage with slrn
 
 `$ ./nntpit -D -p 8119`
 
@@ -43,15 +43,17 @@ Press `a` to add a group, and type the name of the subreddit you want to subscri
 
 It should populate a list of articles and comments for you to read.
 
-## Usage with tin
+## Usage with other clients
 
-tin needs the server to be first taught about the subreddits you want to
+Some clients need the server to be first taught about the subreddits you want to
 read so they can be added to the database.  You only need to specify them
 on the command line one time:
 
-`$ ./nntpit -D -p 8119 retrocomputing usenet`
+`$ ./nntpit -D -p 8119 retrocomputing usenet classicusenet`
 
-Now start tin:
+### Usage with tin
+
+Start tin:
 
 `$ tin -r -g localhost -p 8119`
 
@@ -59,6 +61,27 @@ The groups list will be empty at first, but don't worry: that's normal.
 
 Press `S` to add a group, and type the name of the subreddit you want to subscribe to
 (eg 'usenet' for /r/usenet).
+
+### Usage with Thunderbird
+
+Start Thunderbird, go to menu -> Account Settings -> Account Actions -> Add
+Other Account.  The Account Wizard appears.
+
+Select Newsgroup account, Next, your name and email address can be whatever
+as they aren't used (but must look like an email address), Next.  Newsgroup
+Server should be 'localhost', Next, Account name can be whatever you like,
+Next, Finish.
+
+The account with your given name should appear in the Account Settings
+sidebar.  Click on Server Settings and change the port number to 8119. 
+Close the account settings window.
+
+In the main folders window the account should show in the sidebar.  Click on
+it, click 'Manage newsgroup subscriptions'.  The subreddits that nntpit
+knows about should be shown.  Tick the ones you want to read and click OK.
+
+The subreddits should now appear in the sidebar and you can click to open
+each one up and read the messages.
 
 # Reporting Bugs
 
