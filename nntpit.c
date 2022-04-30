@@ -134,7 +134,7 @@ usage(p)
   char const  *p;
 {
   fprintf(stderr,
-"usage: %s [-VDhIS] [-t <threads>] [-l <host>] [-p <port>]\n"
+"usage: %s [-VDhIS] [-t <threads>] [-l <host>] [-p <port>] [subreddit] [subreddit] ...\n"
 "\n"
 "    -V                   print version and exit\n"
 "    -h                   print this text\n"
@@ -144,6 +144,7 @@ usage(p)
 "    -l <host>            address to listen on (default: localhost)\n"
 "    -p <port>            port to listen on (default: 119)\n"
 "    -t <threads>         number of processing threads (default: 1)\n"
+"    [subreddit]          optionally force-add these subs to the database\n"
 , p);
 }
 
@@ -224,9 +225,17 @@ int main(int argc, char **argv)
     if (!port)
         port = strdup("119");
 
-    if (argv[0]) {
-        usage(progname);
-        return 1;
+    while (argc > 0) {
+        if (argv[0]) {
+            if (debug) fprintf(stderr, "Fetching extra sub '%s'... ", argv[0]);
+            if (fetch_subreddit_json(spool, newsrc, argv[0]) == 0) {
+                if (debug) fprintf(stderr, "the fetch worked\n");
+            } else {
+                fprintf(stderr,"Failed to fetch subreddit '%s'\n", argv[0]);
+            }
+        }
+        argc--;
+        argv++;
     }
 
     main_loop = ev_loop_new(ev_supported_backends());
@@ -923,6 +932,7 @@ void client_read(struct ev_loop *loop, ev_io *w, int revents)
                 client_printf(cl,
                         "101 Capability list:\r\n"
                         "VERSION 2\r\n"
+                        "READER\r\n"
                         "IMPLEMENTATION nntpit %s\r\n", PACKAGE_VERSION);
                 if (do_ihave)
                     client_send(cl, "IHAVE\r\n");
