@@ -599,9 +599,11 @@ void handle_xover_cmd(client_t *cl, const char *param)
                 json_object *created;
                 time_t unixtime;
                 char date[128];
-                const char* body;
+                const char *body;
                 int byte_count;
                 unsigned line_count;
+                bool iscomment;
+
                 if (!json_object_object_get_ex(object, "data", &data))
                     continue;
 
@@ -617,8 +619,12 @@ void handle_xover_cmd(client_t *cl, const char *param)
                 // RFC822 Format
                 strftime(date, sizeof date, "%a, %d %b %Y %T %z", gmtime(&unixtime));
 
+                // If this is a comment we need to generate Xrefs, and prefix the subject with "Re:"
+                iscomment = reddit_object_type(object) == REDDIT_OBJ_COMMENT;
+
                 if (article_generate_references(spool, object, &references) != 0)
                     references = "null";
+
                 if (references && *references == 0)
                     references = "null";
 
@@ -626,8 +632,9 @@ void handle_xover_cmd(client_t *cl, const char *param)
                 byte_count = body ? strlen(body) : 0;
                 line_count = body ? str_count_newlines(body) : 0;
 
-                client_printf(cl, "%d\t%s\t%s\t%s\t<%s@reddit>\t%s\t%d\t%u\r\n",
+                client_printf(cl, "%d\t%s%s\t%s\t%s\t<%s@reddit>\t%s\t%d\t%u\r\n",
                                   i,
+                                  iscomment ? "Re: " : "",
                                   json_object_get_string_prop(data, "title"),
                                   json_object_get_string_prop(data, "author"),
                                   date,
